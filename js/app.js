@@ -1,3 +1,6 @@
+import { drawCircle, drawLine } from "./drawing.js";
+import { Room, Stepper } from "./gamework.js";
+
 const CANVAS_ID = "world";
 
 let x_pos = 0;
@@ -14,20 +17,13 @@ function wrap(current, min, max) {
 	return current;
 }
 
-function Room(ctx) {
-	this.ctx = ctx;
-	this.width = ctx.canvas.clientWidth;
-	this.height = ctx.canvas.clientHeight;
-}
-
 function distance(a, b) {
 	return Math.hypot(a.x-b.x, a.y-b.y);
 }
 
-function Dot(room, stepper, x, y, r=3, dx=0, dy=0, maxDist=45) {
+function Dot(room, x, y, r=3, dx=0, dy=0, maxDist=45) {
 	this.ctx = room.ctx;
 	this.room = room;
-	this.stepper = stepper;
 	this.x = x;
 	this.y = y;
 	this.r = r;
@@ -44,7 +40,7 @@ function Dot(room, stepper, x, y, r=3, dx=0, dy=0, maxDist=45) {
 	}
 	
 	this.endStep = function() {
-		this.partners = stepper.instances.filter(partner => distance(this, partner) <= maxDist);
+		this.partners = room.instances.filter(partner => distance(this, partner) <= maxDist);
 	}
 	
 	this.draw = function() {
@@ -53,26 +49,12 @@ function Dot(room, stepper, x, y, r=3, dx=0, dy=0, maxDist=45) {
 	}
 }
 
-function Stepper(room) {
-	this.room = room;
-	this.ctx = room.ctx;
-	this.instances=[];
-	this.stepAll = function() {
-		this.instances.forEach(instance => instance.step());
-		this.instances.forEach(instance => instance.endStep());
-	}
-	this.drawAll = function() {
-		clearCanvas(this.ctx);
-		this.instances.forEach(instance => instance.draw());
-	}
-}
-
 function randRange(min, max) {
 	return Math.random() * (max - min) + min;
 }
 
-function randomDot(room, stepper, minX, maxX, minY, maxY, minR, maxR, minDx, maxDx, minDy, maxDy) {
-	return new Dot(room, stepper,
+function randomDot(room, minX, maxX, minY, maxY, minR, maxR, minDx, maxDx, minDy, maxDy) {
+	return new Dot(room,
 			   randRange(minX, maxX),
 			   randRange(minY, maxY),
 			   randRange(minR, maxR),
@@ -86,29 +68,15 @@ function createStepper(ctx) {
 	const stepper = new Stepper(room);
 	
 	for(let i = 0; i < 300; i++) {
-		const dot = randomDot(room, stepper,
+		const dot = randomDot(room,
 							  0, room.width,
 							  0, room.height,
 							  3, 3,
 							  -1, 1,
 							  -1, 1);
-		stepper.instances.push(dot);
+		room.instances.push(dot);
 	}
 	return stepper;
-}
-
-function drawCircle(ctx, x, y, r) {
-	ctx.moveTo(0, 0);
-	ctx.beginPath();
-	ctx.arc(x, y, r, 0, 2 * Math.PI);
-	ctx.fill();
-}
-
-function drawLine(ctx, x1, y1, x2, y2) {
-	ctx.beginPath();
-	ctx.moveTo(x1, y1);
-	ctx.lineTo(x2, y2);
-	ctx.stroke();
 }
 
 function init() {
@@ -121,13 +89,6 @@ function init() {
 		window.requestAnimationFrame(recurse);
 	}
 	window.requestAnimationFrame(recurse);
-}
-
-function clearCanvas(ctx) {
-	const width = ctx.canvas.clientWidth;
-	const height = ctx.canvas.clientHeight;
-	
-	ctx.clearRect(0, 0, width, height);
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {
