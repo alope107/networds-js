@@ -26,13 +26,39 @@ export function Room(ctx) {
 export function Stepper(room) {
 	this.room = room;
 	this.ctx = room.ctx;
+	this.running = false;
 	
+	// Runs through each step phase for each instance
 	this.stepAll = function() {
 		this.room.instances.forEach(instance => instance.step());
 		this.room.instances.forEach(instance => instance.endStep());
 	}
+	
+	// Runs through each draw phase for each instance
 	this.drawAll = function() {
 		clearCanvas(this.ctx);
 		this.room.instances.forEach(instance => instance.draw());
+	}
+	
+	// Stops a running stepper. Prevens the stepper from being
+	// registered with the animation frame.
+	this.stop = function() {
+		running = false;
+	}
+	
+	// Registers stepper to loop with animation frame.
+	this.run = function() {
+		// Only start running once.
+		if (this.running) return;
+		this.running = true;
+		
+		let stepper = this;
+		const recurse = function() {
+			if (!stepper.running) return;
+			stepper.stepAll();
+			stepper.drawAll();
+			window.requestAnimationFrame(recurse);
+		}
+		window.requestAnimationFrame(recurse);
 	}
 }
