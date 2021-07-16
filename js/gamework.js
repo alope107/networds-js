@@ -45,10 +45,10 @@ export class Stepper {
 		this.room.instances.forEach(instance => instance.draw());
 	}
 	
-	// Stops a running stepper. Prevens the stepper from being
+	// Stops a running stepper. Prevents the stepper from being
 	// registered with the animation frame.
 	stop() {
-		running = false;
+		this.running = false;
 	}
 	
 	// Registers stepper to loop with animation frame.

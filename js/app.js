@@ -13,8 +13,6 @@ function init() {
 	// Make stepper available for debugging purposes.
 	window.stepper = stepper;
 	stepper.run();
-	
-	
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {

@@ -2,7 +2,7 @@
  Functions for drawing shapes on a canvas given a context.
 */
 
-// Draws circle of radius r centered at position (x,y)
+// Draws filed circle of radius r centered at position (x,y)
 export function drawCircle(ctx, x, y, r) {
 	ctx.moveTo(0, 0);
 	ctx.beginPath();
