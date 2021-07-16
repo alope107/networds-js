@@ -10,7 +10,11 @@ function init() {
 	const canvas = document.getElementById(CANVAS_ID);
 	const ctx = canvas.getContext("2d");
 	const stepper = createNetwordsStepper(ctx);
+	// Make stepper available for debugging purposes.
+	window.stepper = stepper;
 	stepper.run();
+	
+	
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {

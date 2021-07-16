@@ -11,32 +11,35 @@ import { randRange } from "./random.js"
 	It draws itself as a filled circle and draws lines to dots within
 	maxDist pixels.
 */
-export function Dot(room, x, y, r=3, dx=0, dy=0, maxDist=45) {
-	this.ctx = room.ctx;
-	this.room = room;
-	this.x = x;
-	this.y = y;
-	this.r = r;
-	this.dx = dx;
-	this.dy = dy;
-	this.partners = [];
+export class Dot {
+	constructor(room, x, y, r=3, dx=0, dy=0, maxDist=45) {
+		this.ctx = room.ctx;
+		this.room = room;
+		this.x = x;
+		this.y = y;
+		this.r = r;
+		this.dx = dx;
+		this.dy = dy;
+		this.maxDist = maxDist;
+		this.partners = [];
+	}
 	
 	// Move and wrap
-	this.step = function() {
+	step() {
 		this.x += this.dx;
 		this.y += this.dy;
 		
-		this.x = wrap(this.x, 0, room.width);
-		this.y = wrap(this.y, 0, room.height);
+		this.x = wrap(this.x, 0, this.room.width);
+		this.y = wrap(this.y, 0, this.room.height);
 	}
 	
 	// Find neighboring dots
-	this.endStep = function() {
-		this.partners = room.instances.filter(partner => distance(this, partner) <= maxDist);
+	endStep() {
+		this.partners = this.room.instances.filter(partner => distance(this, partner) <= this.maxDist);
 	}
 	
 	// Draw self and lines to neighbors
-	this.draw = function() {
+	draw() {
 		drawCircle(this.ctx, this.x, this.y, this.r);
 		this.partners.forEach(partner => drawLine(this.ctx, this.x, this.y, partner.x, partner.y));
 	}

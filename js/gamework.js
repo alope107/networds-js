@@ -7,11 +7,13 @@
 import { clearCanvas } from "./drawing.js";
 
 // Room holds context and all instances
-export function Room(ctx) {
-	this.ctx = ctx;
-	this.width = ctx.canvas.clientWidth;
-	this.height = ctx.canvas.clientHeight;
-	this.instances=[];
+export class Room {
+	constructor(ctx) {
+		this.ctx = ctx;
+		this.width = ctx.canvas.clientWidth;
+		this.height = ctx.canvas.clientHeight;
+		this.instances=[];
+	}
 }
 
 /*
@@ -23,31 +25,34 @@ export function Room(ctx) {
 	- EndStep
 	- Draw
  */
-export function Stepper(room) {
-	this.room = room;
-	this.ctx = room.ctx;
-	this.running = false;
+export class Stepper {
+	constructor(room) {
+		this.room = room;
+		this.ctx = room.ctx;
+		this.running = false;
+	}
+	
 	
 	// Runs through each step phase for each instance
-	this.stepAll = function() {
+	stepAll() {
 		this.room.instances.forEach(instance => instance.step());
 		this.room.instances.forEach(instance => instance.endStep());
 	}
 	
 	// Runs through each draw phase for each instance
-	this.drawAll = function() {
+	drawAll() {
 		clearCanvas(this.ctx);
 		this.room.instances.forEach(instance => instance.draw());
 	}
 	
 	// Stops a running stepper. Prevens the stepper from being
 	// registered with the animation frame.
-	this.stop = function() {
+	stop() {
 		running = false;
 	}
 	
 	// Registers stepper to loop with animation frame.
-	this.run = function() {
+	run() {
 		// Only start running once.
 		if (this.running) return;
 		this.running = true;
