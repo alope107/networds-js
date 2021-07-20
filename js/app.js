@@ -13,6 +13,11 @@ function init() {
 	// Make stepper available for debugging purposes.
 	window.stepper = stepper;
 	stepper.run();
+	//ctx.fill(characterPath("A", 50, 50, 5));
+	// ctx.beginPath();
+	// ctx.moveTo(0, 0);
+	// ctx.lineTo(5, 5);
+	// ctx.stroke();
 }
 
 window.addEventListener('DOMContentLoaded', (event) => {

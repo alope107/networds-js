@@ -12,7 +12,7 @@ import { randRange } from "./random.js"
 	maxDist pixels.
 */
 export class Dot {
-	constructor(room, bucketer, x, y, r=3, dx=0, dy=0, maxDist=45) {
+	constructor(room, bucketer, x, y, r=3, dx=0, dy=0, maxDist=45, path=undefined, maxConnections=Infinity) {
 		this.ctx = room.ctx;
 		this.room = room;
 		this.bucketer = bucketer;
@@ -23,6 +23,8 @@ export class Dot {
 		this.dy = dy;
 		this.tick = 0;
 		this.maxDist = maxDist;
+		this.path = path;
+		this.maxConnections = maxConnections;
 	}
 	
 	beginStep() {
@@ -46,7 +48,10 @@ export class Dot {
 	}
 	
 	inRange() {
-		return true;
+		if (this.path == undefined) {
+			return true;
+		}
+		return this.ctx.isPointInPath(this.path, this.x, this.y);
 		//const [centeredX, centeredY] = [this.x - (this.room.width/2), this.y - (this.room.width/2)];
 		//return centeredX**2 + centeredY**2 < 1500;
 	}
@@ -56,15 +61,20 @@ export class Dot {
 		if (this.inRange()) {
 			
 		//drawCircle(this.ctx, this.x, this.y, this.r);
+		let connections = 0;
 			for(let neighbor of this.bucketer.getNeighbors(this)) {
-				drawLine(this.ctx, this.x, this.y, neighbor.x, neighbor.y)
+				connections++;
+				if (connections > this.maxConnections) break;
+				
+				drawLine(this.ctx, this.x, this.y, neighbor.x, neighbor.y);
+				
 			}
 		}
 	}
 }
 
 // Creates a new dot with values randomly chosen between the specified values
-export function randomDot(room, bucketer, minX, maxX, minY, maxY, minR, maxR, minDx, maxDx, minDy, maxDy, maxDist=undefined) {
+export function randomDot(room, bucketer, path, minX, maxX, minY, maxY, minR, maxR, minDx, maxDx, minDy, maxDy, maxDist=undefined) {
 	return new Dot(room,
 				   bucketer,
 				   randRange(minX, maxX),
@@ -72,6 +82,7 @@ export function randomDot(room, bucketer, minX, maxX, minY, maxY, minR, maxR, mi
 				   randRange(minR, maxR),
 				   randRange(minDx, maxDx),
 				   randRange(minDy, maxDy),
-				   maxDist);
+				   maxDist,
+				   path);
 			   
 }
