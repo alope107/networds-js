@@ -38,7 +38,10 @@ export class Dot {
 		
 		this.x = wrap(this.x, 0, this.room.width);
 		this.y = wrap(this.y, 0, this.room.height);
-		this.bucketer.addToBucket(this);
+		
+		if (this.inRange()) {
+			this.bucketer.addToBucket(this);
+		}
 		
 		this.tick++;
 	}

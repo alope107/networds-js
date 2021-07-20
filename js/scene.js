@@ -7,10 +7,10 @@ import { BucketGameObject } from "./bucketer.js";
 import { Room, Stepper } from "./gamework.js";
 import { randomDot } from "./dot.js";
 
-export function createNetwordsStepper(ctx, dotCount=2000, dotSize=3, speedBounds=.3) {
+export function createNetwordsStepper(ctx, dotCount=700, dotSize=3, speedBounds=.3) {
 	const room = new Room(ctx);
 	const stepper = new Stepper(room);
-	const bucketer = new BucketGameObject(room, 10, 10);
+	const bucketer = new BucketGameObject(room, 30, 30);
 	const path = characterPath("Q", 200, 200, 20);
 	
 	room.instances.push(bucketer);
