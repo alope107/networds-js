@@ -21,6 +21,7 @@ export class Room {
 	on all the instances in the room.
 	
 	Event order:
+	- BeginStep
 	- Step
 	- EndStep
 	- Draw
@@ -35,6 +36,7 @@ export class Stepper {
 	
 	// Runs through each step phase for each instance
 	stepAll() {
+		this.room.instances.forEach(instance => instance.beginStep());
 		this.room.instances.forEach(instance => instance.step());
 		this.room.instances.forEach(instance => instance.endStep());
 	}
