@@ -3,6 +3,10 @@
 	Path data taken from: https://fanzhongzeng78.medium.com/replacing-text-with-svg-paths-in-javascript-b42ee1d7f583
 */
 
+import { drawLine } from "./drawing.js";
+
+import { ShapeInfo, Intersection, Point2D, Matrix2D } from "./node_modules/kld-intersections/dist/index-esm.js";
+
 const characterArray =
 {
 	0:"m3.6 0.1c-0.9 0-1.6-0.4-2-1.1s-0.7-1.9-0.7-3.3c0-2.9 0.9-4.4 2.7-4.4 0.9 0 1.6 0.4 2.1 1.1s0.7 1.8 0.7 3.3c-0.1 2.9-1 4.4-2.8 4.4zm0-0.9c0.6 0 1-0.3 1.3-0.8s0.4-1.4 0.4-2.7c0-1.2-0.1-2.1-0.4-2.7s-0.7-0.8-1.3-0.8c-0.6 0-1 0.3-1.3 0.8s-0.4 1.5-0.4 2.7c0 1.2 0.1 2.1 0.4 2.7s0.7 0.8 1.3 0.8z",
@@ -106,7 +110,120 @@ export function characterPath(character, xTrans=0, yTrans=0, scale=1) {
 	const transform = new DOMMatrix();
 	transform.translateSelf(xTrans, yTrans, 0);
 	transform.scaleSelf(scale, scale, 1);
+	
 	const path = new Path2D();
 	path.addPath(new Path2D(characterArray[character]), transform);
 	return path;
+}
+
+export class CharacterSVG {
+	constructor(ctx, character, xTrans=0, yTrans=0, scale=1) {
+		this.ctx = ctx;
+		this._character = character;
+		this._xTrans = xTrans;
+		this._yTrans = yTrans;
+		this._scale = scale;
+		this._path = this.computePath();
+		this._shapeInfo = this.computeShapeInfo();
+	}
+	
+	set character(c) {
+		this._character = c;
+		this._path = this.computePath();
+		this._shapeInfo = this.computeShapeInfo();
+	}
+	
+	set xTrans(c) {
+		this._xTrans = xTrans;
+		this._path = this.computePath();
+	}
+	
+	set yTrans(c) {
+		this._xTrans = xTrans;
+		this._path = this.computePath();
+	}
+	
+	set scale(c) {
+		this._character = c;
+		this._path = this.computePath();
+	}
+	
+	get path() {
+		return this._path;
+	}
+	
+	get xTrans() {
+		return this._xTrans;
+	}
+	
+	get yTrans() {
+		return this.yTrans;
+	}
+	get scale() {
+		return this._scale;
+	}
+	
+	computePath() {
+		return characterPath(this._character, this._xTrans, this._yTrans, this._scale);
+	}
+	
+	computeShapeInfo() {
+		return ShapeInfo.path(characterArray[this._character]);
+	}
+	
+	containsPoint(x, y) {
+		return this.ctx.isPointInPath(this._path, x, y);
+	}
+	
+	lineIntersections(x1, y1, x2, y2) {
+		const line = {
+			p1: new Point2D(x1, y1),
+			p2: new Point2D(x2, y2),
+		};
+		
+		// drawLine(this.ctx, line.p1.x, line.p1.y, line.p2.x, line.p2.y);
+		// Perform the reverse transforms to check intersections with untransformed character path
+		// const rotateTrans = Matrix2D.rotation(1);
+		
+		const scaleTrans = Matrix2D.scaling(1/this._scale);
+		const transTrans = Matrix2D.translation(-this._xTrans, -this._yTrans);
+		
+		
+		const transformedLine = {
+			p1: line.p1.transform(transTrans).transform(scaleTrans),
+			p2: line.p2.transform(transTrans).transform(scaleTrans),
+		};
+		
+		// drawLine(this.ctx, transformedLine.p1.x, transformedLine.p1.y,
+						   // transformedLine.p2.x, transformedLine.p2.y);
+		
+		// console.log(line);
+		// console.log(transformedLine);
+		
+		const lineInfo = ShapeInfo.line([transformedLine.p1.x, transformedLine.p1.y],
+										[transformedLine.p2.x, transformedLine.p2.y]);
+		
+		// console.log(this._shapeInfo);
+		// console.log(lineInfo);
+		const intersections = Intersection.intersect(this._shapeInfo, lineInfo);
+		
+		//console.log(intersections.points.length);
+		return intersections.points;
+	}
+	
+	beginStep() {
+		
+	}
+	
+	step() {
+	}
+	
+	endStep() {
+	}
+	
+	draw() {
+		//this.ctx.stroke(this._path);
+		
+		//this.ctx.stroke(characterPath(this._character));
+	}
 }
